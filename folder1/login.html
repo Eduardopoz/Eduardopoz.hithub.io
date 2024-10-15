@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiencia Extraordinaria para Allison</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            font-family: Arial, sans-serif;
+        }
+        #scene {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 4vw;
+            text-align: center;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+        #startButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            font-size: 24px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        #startButton:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 0 20px #ff00ff;
+        }
+    </style>
+</head>
+<body>
+    <div id="scene"></div>
+    <div id="message"></div>
+    <button id="startButton">Iniciar Experiencia Mágica</button>
+
+    <script>
+        let scene, camera, renderer, heart, particles;
+        const messages = [
+            "Allison",
+            "Eres una princesa de Dios",
+            "Tu belleza ilumina el mundo",
+            "Tu amor es un regalo precioso",
+            "Eres única y especial",
+            "Tu sonrisa es magia pura"
+        ];
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('scene').appendChild(renderer.domElement);
+
+            // Crear corazón
+            const heartShape = new THREE.Shape();
+            heartShape.moveTo(25, 25);
+            heartShape.bezierCurveTo(25, 25, 20, 0, 0, 0);
+            heartShape.bezierCurveTo(-30, 0, -30, 35, -30, 35);
+            heartShape.bezierCurveTo(-30, 55, -10, 77, 25, 95);
+            heartShape.bezierCurveTo(60, 77, 80, 55, 80, 35);
+            heartShape.bezierCurveTo(80, 35, 80, 0, 50, 0);
+            heartShape.bezierCurveTo(35, 0, 25, 25, 25, 25);
+
+            const extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
+            const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+            const material = new THREE.MeshPhongMaterial({ color: 0xff1493 });
+            heart = new THREE.Mesh(geometry, material);
+            heart.scale.set(0.2, 0.2, 0.2);
+            scene.add(heart);
+
+            // Crear partículas
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCnt = 5000;
+            const posArray = new Float32Array(particlesCnt * 3);
+            for(let i = 0; i < particlesCnt * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 5;
+            }
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMaterial = new THREE.PointsMaterial({ size: 0.005, color: 0xffffff });
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            // Iluminación
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(0, 0, 10);
+            scene.add(light);
+
+            camera.position.z = 5;
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            heart.rotation.y += 0.01;
+            particles.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+
+        function startExperience() {
+            document.getElementById('startButton').style.display = 'none';
+            init();
+            playBackgroundMusic();
+            showMessages();
+        }
+
+        function playBackgroundMusic() {
+            const audio = new Audio('https://example.com/background-music.mp3');
+            audio.loop = true;
+            audio.play();
+        }
+
+        function showMessages() {
+            const messageElement = document.getElementById('message');
+            let index = 0;
+            setInterval(() => {
+                messageElement.style.opacity = 0;
+                setTimeout(() => {
+                    messageElement.textContent = messages[index];
+                    messageElement.style.opacity = 1;
+                    index = (index + 1) % messages.length;
+                }, 2000);
+            }, 5000);
+        }
+
+        document.getElementById('startButton').addEventListener('click', startExperience);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
